@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>响应式原理</title>
+</head>
+<body>
+
+    name输入: <input type="text" name="input" id="input" v-model="name" />
+    name输出: <h2 id="output" style="display: inline-block" v-text="name" ></h2>
+    <br>
+    <div v-text="name"></div>
+    num输入: <input type="text" name="input" id="num" v-model="num" />
+    num输出: <h1 v-text="num" style="display: inline-block" ></h1>
+    <br>
+    <button @click="increment">自增num</button>
+
+<script>
+    const data = {
+        name: "hello world",
+        num: 1
+    }
+
+    const methods = {
+        "increment": increment
+    }
+
+    const app = {}
+    const dep = new Map()
+
+    Object.keys(data).forEach(key => {
+        Object.defineProperty(app, key, {
+            get() {
+                // console.log(`getter ${key}`) // "touch"
+                return data[key]
+            },
+            set(value) {
+                // console.log(`setter ${key} = ${value}`) // "setter"
+                data[key] = value
+                Watcher(key) // notify to Watcher
+            }
+        });
+        // 创建依赖通知 function 集合
+        dep.set(key, [])
+    })
+
+    const create_v_model_dep = (key, node) => {
+        // v-model="name"
+        dep.get(key).push(() => {
+            // console.log("invoke node:", node.nodeName)
+            node.value = app[key];
+        })
+        node.addEventListener("input", ev => {
+            app[key] = ev.target.value
+        })
+    }
+
+    const create_v_text_dep = (key, node) => {
+        // v-text="name"
+        dep.get(key).push(() => {
+            // console.log("invoke node:", node.nodeName)
+            node.innerText = app[key]
+        })
+    }
+
+    const create_v_on_click = (key, node) => {
+        node.addEventListener("click", methods[key])
+    }
+
+    const init = () => {
+        // 遍历每个节点，获取属性v-model，v-text，@click来添加响应式
+        document.body.childNodes.forEach(child => {
+            // 如果子节点是元素节点
+            if (child.nodeType === 1) {
+                console.log("enter", child)
+                for (let i = 0; i < child.attributes.length; i++) {
+                    let attr = child.attributes[i];
+                    console.log("forEach attributes", attr)
+                    if (attr.name === "v-model") {
+                        console.log("读取到v-model属性", child.nodeName)
+                        create_v_model_dep(attr.value, child)
+                    }
+                    if (attr.name === "v-text") {
+                        console.log("读取到v-text属性", child.nodeName)
+                        create_v_text_dep(attr.value, child)
+                    }
+                    if (attr.name === "@click") {
+                        console.log("读取到@click属性", child.nodeName)
+                        create_v_on_click(attr.value, child)
+                    }
+                }
+            }
+        })
+
+        // 初始化通知Watcher
+        Object.keys(data).forEach(key => {
+            Watcher(key)
+        })
+    }
+
+    const Watcher = (key) => {
+        if (dep.has(key)) {
+            dep.get(key).forEach(watcherFunc => watcherFunc())
+        }
+    }
+
+    function increment(ev) {
+        app.num++
+    }
+
+    init()
+</script>
+
+<script>
+    const obj2 = {}
+    let a = 1
+    let b = 2
+    // 给obj2这个对象添加一个新属性a
+    Object.defineProperty(obj2, 'a', {
+        get () {
+            console.log("有人访问了a")
+            return a
+        },
+        set (value) {
+            console.log("有人修改了a:", value)
+            a = value
+        }
+    })
+    // 给obj2这个对象添加一个新属性b
+    Object.defineProperty(obj2, 'b', {
+        get () {
+            console.log("有人访问了b")
+            return b
+        },
+        set (value) {
+            console.log("有人修改了b:", value)
+            b = value
+        }
+    })
+</script>
+</body>
+</html>

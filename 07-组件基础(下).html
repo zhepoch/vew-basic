@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>组件基础-下</title>
+    <style>
+        .score {
+            display: inline-block;
+        }
+
+        .score>span {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: url("./assets/score_empty.png") center center / 16px 16px;
+            cursor: pointer;
+        }
+
+        .score>span.on {
+            background: url("./assets/score.png") center center / 16px 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <v-score v-model="speed">
+            <template #header>配送速度:</template>
+            <template #footer>~</template>
+        </v-score>
+        <br>
+        <v-score v-model="service">
+            <template #header>服务质量:</template>
+            <template #footer>~</template>
+        </v-score>
+        <br>
+        <v-score v-model="goodVerb">
+            <template #header>商品评价:</template>
+            <template #footer>~</template>
+        </v-score>
+        <br>
+        <!--  <textarea v-model.trim.lazy="userVerb" cols="30" rows="3"></textarea>-->
+        <textarea :value="userVerb" @input="userVerb=$event.target.value" cols="30" rows="3"></textarea>
+        <br>
+        <button @click="submit">提交</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+
+    <script>
+
+        Vue.component("v-score", {
+            template: `
+              <div class="score">
+              <slot name="header"></slot>
+              <span v-for='i in 5' :key="i" :class="{on: i <= value}" @click='$emit("input", i)' @mouseenter=""></span>
+              <slot name="footer"></slot>
+              </div>
+            `,
+            props: {
+                value: { type: Number, default: 0 },
+            },
+        });
+
+        const app = new Vue({
+            el: "#app",
+            data: {
+                speed: 0,
+                service: 0,
+                goodVerb: 1,
+                userVerb: ""
+            },
+            methods: {
+                submit (ev) {
+                    const data = {
+                        speed: app.speed,
+                        service: app.service,
+                        goodVerb: app.goodVerb,
+                        userVerb: app.userVerb
+                    }
+                    console.log(data)
+                }
+            }
+        })
+    </script>
+
+</body>
+</html>

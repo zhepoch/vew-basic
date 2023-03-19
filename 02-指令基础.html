@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Vue指令基础</title>
+        <style>
+            [v-cloak] { display: none; }
+            .a1 { color: red; }
+            .a2 { font-size: 120px; }
+            .a3 { color: chartreuse; }
+            
+            .outer {
+                width: 400px;
+                height: 400px;
+                border: 1px solid red;
+            }
+            
+            .inner {
+                width: 200px;
+                height: 200px;
+                border: 1px solid magenta;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div id="app">
+            <h1 v-cloak>{{ msg }}</h1>
+            <h1 v-text='msg'></h1>
+            <div v-html='content'></div>
+            
+            <hr>
+            
+            <div v-bind:class='`${cc}`'>测试动态样式</div>
+            <button @click="dynamic_style">更改样式</button>
+            
+            <div :class='{a1: enable_a1, a2: enable_a2, a3: enable_a3}'><span>你好呀</span></div>
+            
+            <hr>
+            
+            <div :style='`color:${enable_red ? "red" : "green"}`'><span>测试动态style</span></div>
+            <div :style='{color: enable_red ? "red" : "green", fontSize: `${num}px`}'><span>测试动态style</span></div>
+            
+            <hr>
+            
+            <button @click="button_click">点击</button>
+            
+            <div :class="'outer'" @click.once="outer_click">
+                <div class="inner" @click.stop="inner_click"></div>
+            </div>
+            
+            <hr>
+            
+            <label for="name">姓名：</label><input type="text" name="name" id="name" v-model.trim="name"/><br>
+            <label for="age">年龄：</label><input type="number" name="age" id="age" v-model.number="age"><br>
+            <label for="intro">简介：</label><textarea name="intro" id="intro" cols="30" rows="10" v-model.lazy="intro"></textarea><br>
+            
+            
+            <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+            <label for="jack">Jack</label>
+            <input type="checkbox" id="john" value="John" v-model="checkedNames">
+            <label for="john">John</label>
+            <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+            <label for="mike">Mike</label>
+            <br>
+            <span>Checked names: {{ checkedNames }}</span>
+            
+            
+            <hr>
+            <div v-for='(item, index) in todoList' :key="item.id">
+                <div :style="{background: item.completed ? 'red' : '', height: '25px'}">
+                    <span v-if="item.completed">
+                        <span @click="change_complete_status(item, index)">√</span>
+                    </span>
+                    <span v-else>
+                        <input de type="checkbox" name="completed" id="item.id" @click.prevent="change_complete_status(item, index)">
+                    </span>
+                    <span v-text="item.name" :style="{'text-decoration-line': item.completed ? 'line-through' :'none'}"></span>
+                    <span @click="completed_todo(index)">x</span>
+                </div>
+            </div>
+   
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+        
+        <script>
+            const app = new Vue({
+                el: '#app',
+                data: {
+                    msg: "你好Vue <h6>nihao</h6>",
+                    content: '<a href="https://www.google.com.hk" target="_blank" rel="noopener noreferrer">Google</a>',
+                    cc: "a1",
+                    enable_a1: false,
+                    enable_a2: true,
+                    enable_a3: true,
+                    enable_red: true,
+                    num: 40,
+                    name: "",
+                    age: 0,
+                    intro: "",
+                    checkedNames: [],
+                    todoList: [
+                        {id:1, name: "name1", intro:"intro something.....", completed: false},
+                        {id:2, name: "name2", intro:"intro something.....", completed: false},
+                        {id:3, name: "name3", intro:"intro something.....", completed: false},
+                        {id:4, name: "name4", intro:"intro something.....", completed: false},
+                        {id:5, name: "name5", intro:"intro something.....", completed: false},
+                    ]
+                },
+                methods: {
+                    change: () => {
+                        this.msg = "你好"
+                    },
+                    dynamic_style: () => {
+                        app.cc = "a2 a3"
+                        console.log(app)
+                    },
+                    button_click: (event) => {
+                        console.log("button clicked.", event)
+                    },
+                    outer_click () {
+                        console.log("outer clicked.")
+                    },
+                    inner_click () {
+                        console.log("inner clicked.")
+                    },
+                    change_complete_status(item, index) {
+                        console.log(item, index)
+                        this.todoList[index].completed = !this.todoList[index].completed
+                    },
+                    completed_todo(index) {
+                        this.todoList.splice(index, 1)
+                    }
+                },
+            })
+            
+            
+            // setInterval(function() {
+            //     console.log(`姓名:${app.name} 年龄:${app.age} 简介:${app.intro}`)
+            // }, 500)
+        </script>
+    </body>
+</html>

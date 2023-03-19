@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>计算属性</title>
+    </head>
+    <body>
+        <div id="app">
+            <h1 v-text="compute_price_total"></h1>
+            
+            <hr>
+            
+            <h1 v-text="cache_random"></h1>
+            
+            <hr>
+            
+            名: <input type="text" v-model="lastName" /> 
+            姓: <input type="text" v-model="firstName" />
+            <br>
+            全名: <input type="text" v-model="username" />
+            
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+        
+        <script>
+            const app = new Vue({
+                el: "#app",
+                data: {
+                    num: 2,
+                    price: 9.99,
+                    count: 100,
+                    firstName: "",
+                    lastName: ""
+                },
+                computed: {
+                    compute_price_total() {
+                        const total_number = this.num * this.price
+                        const total_price = total_number.toFixed(2)
+                        return `总价: ￥${total_price}`
+                    },
+                    cache_random() {
+                        return Math.random() * this.count
+                    },
+                    username: {
+                        get () {
+                            return this.lastName + "." + this.firstName
+                        },
+                        set (val) {
+                            const nameList = val.split(".")
+                            this.lastName = nameList[0]
+                            this.firstName = nameList[1]
+                        }
+                    }
+                },
+                methods: {
+                    name() {
+                        
+                    }
+                },
+            })
+        </script>
+        
+    </body>
+</html>
